@@ -198,17 +198,21 @@
 
         .phase-header {
             padding: 25px 30px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             background: linear-gradient(135deg, rgba(80, 0, 0, 0.2), rgba(139, 0, 0, 0.15));
             border-radius: 20px 20px 0 0;
         }
         .phase-title { font-size: 20px; font-weight: 600; color: #ffffff; }
         .phase-description { color: rgba(255, 255, 255, 0.8); font-size: 14px; }
         
+        .meeting-designer-container {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 0 0 20px 20px;
+            padding: 20px;
+        }
+
         .meeting-designer {
             display: flex;
             gap: 20px;
-            margin-top: 20px;
         }
         .agenda-builder { flex: 2; }
         .toolbox { flex: 1; }
@@ -220,12 +224,20 @@
             padding: 15px;
             margin-bottom: 15px;
             min-height: 100px;
+            transition: all 0.3s ease;
         }
         .drop-zone.drag-over {
             background: rgba(80, 0, 0, 0.3);
             border-color: #ffb3b3;
         }
         .drop-zone h4 { color: #ffb3b3; margin-bottom: 10px; }
+        .drop-zone-placeholder {
+            color: rgba(255,255,255,0.4);
+            font-style: italic;
+            font-size: 13px;
+            text-align: center;
+            padding: 10px;
+        }
 
         .agenda-item {
             background: rgba(255,255,255,0.1);
@@ -242,6 +254,13 @@
             font-size: 16px;
             font-weight: 600;
             color: #ffb3b3;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+        }
+        .step-instruction {
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
             margin-bottom: 15px;
         }
         
@@ -281,8 +300,8 @@
         .score-value { font-size: 32px; font-weight: 700; margin-bottom: 6px; }
         .score-label { font-size: 11px; color: rgba(255, 255, 255, 0.6); text-transform: uppercase; letter-spacing: 1px; }
 
-        .feedback-section { background: rgba(46, 204, 113, 0.08); border: 1px solid rgba(46, 204, 113, 0.15); border-radius: 14px; padding: 20px; }
-        .feedback-title { font-size: 16px; font-weight: 600; color: #2ecc71; margin-bottom: 12px; }
+        .feedback-section { background: rgba(255, 255, 255, 0.04); border-radius: 14px; padding: 20px; }
+        .feedback-title { font-size: 16px; font-weight: 600; color: #ffb3b3; margin-bottom: 12px; }
         .feedback-content { font-size: 14px; }
         .next-step-section { text-align: center; margin-top: 30px; }
 
@@ -444,7 +463,6 @@
                 currentScenario = scenarios[scenarioId];
                 
                 let toolboxItemsHTML = '';
-                // Shuffle items for variety
                 currentScenario.agendaItems.sort(() => Math.random() - 0.5).forEach(item => {
                     toolboxItemsHTML += `<div class="agenda-item" draggable="true" data-id="${item.id}" data-section="${item.section}">${item.text}</div>`;
                 });
@@ -454,21 +472,23 @@
                         <h3 class="phase-title">${currentScenario.title}</h3>
                         <p class="phase-description">${currentScenario.situation}</p>
                     </div>
-                    <div class="phase-content">
+                    <div class="meeting-designer-container">
                         <div id="step1-type">
                             <h4 class="step-title">Step 1: Choose the Primary Meeting Type</h4>
+                            <p class="step-instruction">Select the one meeting type that best matches the scenario's objective.</p>
                             <div class="choice-option meeting-type-choice" data-type="planning"><p><strong>Planning Meeting:</strong> To establish objectives and coordinate responsibilities.</p></div>
                             <div class="choice-option meeting-type-choice" data-type="problem-solving"><p><strong>Problem-Solving Meeting:</strong> To address specific challenges and make decisions.</p></div>
                             <div class="choice-option meeting-type-choice" data-type="coordination"><p><strong>Coordination Meeting:</strong> To monitor progress and maintain alignment.</p></div>
                         </div>
 
                         <div id="step2-agenda" style="display:none; margin-top: 20px;">
-                            <h4 class="step-title">Step 2: Build the Meeting Agenda (Drag & Drop)</h4>
+                            <h4 class="step-title">Step 2: Build the Meeting Agenda</h4>
+                            <p class="step-instruction">Drag all the items from the Toolbox into the correct agenda sections.</p>
                             <div class="meeting-designer">
                                 <div class="agenda-builder">
-                                    <div class="drop-zone" data-zone="opening"><h4>Opening (10%)</h4></div>
-                                    <div class="drop-zone" data-zone="working"><h4>Working Section (70%)</h4></div>
-                                    <div class="drop-zone" data-zone="closing"><h4>Closing (20%)</h4></div>
+                                    <div class="drop-zone" data-zone="opening"><h4>Opening (10%)</h4><div class="drop-zone-placeholder">Drag items here...</div></div>
+                                    <div class="drop-zone" data-zone="working"><h4>Working Section (70%)</h4><div class="drop-zone-placeholder">Drag items here...</div></div>
+                                    <div class="drop-zone" data-zone="closing"><h4>Closing (20%)</h4><div class="drop-zone-placeholder">Drag items here...</div></div>
                                 </div>
                                 <div class="toolbox sidebar-section">
                                     <h4 class="sidebar-title">Agenda Items</h4>
@@ -479,6 +499,7 @@
                         
                         <div id="step3-structure" style="display:none; margin-top: 20px;">
                              <h4 class="step-title">Step 3: Select the Core Conversation Structure</h4>
+                             <p class="step-instruction">Choose the best structure for the main part of the meeting.</p>
                              <div class="choice-option structure-choice" data-type="info-sharing"><p><strong>Info Sharing & Analysis:</strong> Get comprehensive input from all team members.</p></div>
                              <div class="choice-option structure-choice" data-type="problem-analysis"><p><strong>Problem Analysis & Solution:</strong> Systematically understand and solve a challenge.</p></div>
                              <div class="choice-option structure-choice" data-type="action-planning"><p><strong>Action Planning & Accountability:</strong> Convert decisions into concrete next steps.</p></div>
@@ -530,6 +551,7 @@
                 });
 
                 dropZones.forEach(zone => {
+                    const placeholder = zone.querySelector('.drop-zone-placeholder');
                     zone.addEventListener('dragover', e => {
                         e.preventDefault();
                         zone.classList.add('drag-over');
@@ -542,6 +564,7 @@
                         zone.classList.remove('drag-over');
                         const draggable = document.querySelector('.dragging');
                         if (draggable) {
+                            if (placeholder) placeholder.style.display = 'none';
                             zone.appendChild(draggable);
                         }
                     });
@@ -565,15 +588,12 @@
                 const workingZone = document.querySelector('.drop-zone[data-zone="working"]');
                 const closingZone = document.querySelector('.drop-zone[data-zone="closing"]');
                 
-                openingZone.querySelectorAll('.agenda-item').forEach(item => {
-                    if(item.dataset.section === 'opening') designScore += 10;
-                });
-                workingZone.querySelectorAll('.agenda-item').forEach(item => {
-                    if(item.dataset.section === 'working') designScore += 10;
-                });
-                 closingZone.querySelectorAll('.agenda-item').forEach(item => {
-                    if(item.dataset.section === 'closing') designScore += 10;
-                });
+                let correctItems = 0;
+                openingZone.querySelectorAll('.agenda-item').forEach(item => { if(item.dataset.section === 'opening') correctItems++; });
+                workingZone.querySelectorAll('.agenda-item').forEach(item => { if(item.dataset.section === 'working') correctItems++; });
+                closingZone.querySelectorAll('.agenda-item').forEach(item => { if(item.dataset.section === 'closing') correctItems++; });
+                
+                designScore += Math.round((correctItems / currentScenario.agendaItems.length) * 60);
                 scores.design = Math.min(100, designScore);
 
                 // Score Engagement
@@ -581,8 +601,8 @@
                 if (scores.structureType === currentScenario.correctStructure) {
                     engagementScore += 50;
                 }
-                if (scores.design > 70) engagementScore += 50;
-                else if (scores.design > 40) engagementScore += 25;
+                if (scores.design > 80) engagementScore += 50;
+                else if (scores.design > 50) engagementScore += 25;
                 scores.engagement = engagementScore;
                 
                 // Score Outcome
@@ -600,19 +620,25 @@
                 document.getElementById('finalEngagement').textContent = scores.engagement;
                 document.getElementById('finalOutcome').textContent = scores.outcome;
 
-                let feedback = `Your final design achieved an overall outcome score of ${scores.outcome}.<br/><br/>`;
-                if(scores.design < 60) {
-                    feedback += "<strong>Design Feedback:</strong> The agenda structure could be stronger. Ensure you're selecting the right meeting type and placing core items like 'Purpose Statement' and 'Action Items' in the correct sections.<br/>";
+                let designFeedback, engagementFeedback;
+
+                if (scores.design >= 80) {
+                    designFeedback = "<strong>Design Feedback:</strong> Excellent! Your agenda is well-structured, with all components in the right place for a logical flow.";
+                } else if (scores.design >= 50) {
+                    designFeedback = "<strong>Design Feedback:</strong> Solid structure, but a few agenda items were misplaced. A well-ordered agenda reduces cognitive load for the team.";
                 } else {
-                    feedback += "<strong>Design Feedback:</strong> Great job structuring the meeting! The agenda is logical and covers the essential components for a productive conversation.<br/>";
-                }
-                 if(scores.engagement < 75) {
-                    feedback += "<strong>Engagement Feedback:</strong> The chosen conversation structure might not be the most effective for this scenario's specific challenge, which could impact team engagement.";
-                } else {
-                    feedback += "<strong>Engagement Feedback:</strong> Excellent choice of conversation structure! This approach is well-suited to engage participants and solve the problem effectively.";
+                    designFeedback = "<strong>Design Feedback:</strong> The meeting design has significant structural issues. A clear Opening, Working Section, and Closing is critical for an effective meeting.";
                 }
 
-                document.getElementById('feedbackContent').innerHTML = feedback;
+                if (scores.engagement >= 80) {
+                    engagementFeedback = "<strong>Engagement Feedback:</strong> Perfect! You chose the ideal conversation structure for this scenario, which will maximize team engagement and lead to a great outcome.";
+                } else if (scores.engagement >= 50) {
+                    engagementFeedback = "<strong>Engagement Feedback:</strong> A reasonable choice, but a different conversation structure might have been more effective for this specific challenge.";
+                } else {
+                    engagementFeedback = "<strong>Engagement Feedback:</strong> The chosen structure doesn't match the meeting's goal. This mismatch will likely lead to confusion and disengagement.";
+                }
+
+                document.getElementById('feedbackContent').innerHTML = `<p>${designFeedback}</p><p style="margin-top:10px;">${engagementFeedback}</p>`;
             }
 
             function startScenario(scenarioId) {

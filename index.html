@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leadership Meeting Designer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: radial-gradient(ellipse at top, #0f0515 0%, #1a0a1a 30%, #2d1b2e 70%, #0f0515 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 15% 25%, rgba(80, 0, 0, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 85% 75%, rgba(139, 69, 19, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-section {
+            background: rgba(80, 0, 0, 0.15);
+            backdrop-filter: blur(25px);
+            border-bottom: 1px solid rgba(80, 0, 0, 0.2);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .main-title {
+            font-size: clamp(28px, 5vw, 42px);
+            font-weight: 600;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ffffff, #ffb3b3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .main-subtitle {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.75);
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        .status-bar {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .status-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .status-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+        
+        .status-value .scale {
+            font-size: 0.5em;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 400;
+            vertical-align: middle;
+            margin-left: 4px;
+        }
+
+        .main-content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            min-height: calc(100vh - 200px);
+        }
+
+        .sidebar {
+            background: rgba(80, 0, 0, 0.1);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(80, 0, 0, 0.2);
+            padding: 25px;
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+        }
+
+        .sidebar-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(139, 0, 0, 0.6), rgba(80, 0, 0, 0.4));
+            border-radius: 0 3px 3px 0;
+        }
+
+        .sidebar-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffb3b3;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-content {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+        }
+        .sidebar-content ul {
+            list-style-position: inside;
+            padding-left: 5px;
+        }
+        .sidebar-content li { margin-bottom: 10px; }
+        
+        .main-panel {
+            padding: 30px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeInUp 0.8s; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .scenario-selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .scenario-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .scenario-card:hover {
+            transform: translateY(-5px);
+            background: rgba(80, 0, 0, 0.2);
+            border-color: rgba(255, 179, 179, 0.3);
+        }
+        .scenario-card h3 { color: #ffb3b3; margin-bottom: 10px; }
+
+        .phase-header {
+            padding: 25px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: linear-gradient(135deg, rgba(80, 0, 0, 0.2), rgba(139, 0, 0, 0.15));
+            border-radius: 20px 20px 0 0;
+        }
+        .phase-title { font-size: 20px; font-weight: 600; color: #ffffff; }
+        .phase-description { color: rgba(255, 255, 255, 0.8); font-size: 14px; }
+        
+        .meeting-designer {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .agenda-builder { flex: 2; }
+        .toolbox { flex: 1; }
+        
+        .drop-zone {
+            background: rgba(0,0,0,0.2);
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            min-height: 100px;
+        }
+        .drop-zone.drag-over {
+            background: rgba(80, 0, 0, 0.3);
+            border-color: #ffb3b3;
+        }
+        .drop-zone h4 { color: #ffb3b3; margin-bottom: 10px; }
+
+        .agenda-item {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: grab;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .agenda-item:active { cursor: grabbing; }
+
+        .step-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffb3b3;
+            margin-bottom: 15px;
+        }
+        
+        .choice-option {
+            background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px; padding: 15px; cursor: pointer;
+            transition: all 0.3s ease; margin-bottom: 12px;
+        }
+        .choice-option:hover {
+            background: rgba(46, 204, 113, 0.1); border-color: rgba(46, 204, 113, 0.3);
+        }
+        .choice-option.selected {
+            border-color: #2ecc71;
+            background: rgba(46, 204, 113, 0.1);
+        }
+
+        .btn {
+            padding: 12px 25px; border: none; border-radius: 10px; cursor: pointer;
+            font-weight: 600; font-size: 14px; transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #2ecc71, #27ae60); color: white;
+            box-shadow: 0 8px 25px rgba(46, 204, 113, 0.3);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(46, 204, 113, 0.4); }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.12); color: #ffffff; }
+
+        .results-panel { display: none; }
+        .results-panel.show { display: block; animation: fadeInUp 0.8s; }
+
+        .scores-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 30px 0; }
+        .score-card { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 14px; padding: 20px; text-align: center; }
+        .score-value { font-size: 32px; font-weight: 700; margin-bottom: 6px; }
+        .score-label { font-size: 11px; color: rgba(255, 255, 255, 0.6); text-transform: uppercase; letter-spacing: 1px; }
+
+        .feedback-section { background: rgba(46, 204, 113, 0.08); border: 1px solid rgba(46, 204, 113, 0.15); border-radius: 14px; padding: 20px; }
+        .feedback-title { font-size: 16px; font-weight: 600; color: #2ecc71; margin-bottom: 12px; }
+        .feedback-content { font-size: 14px; }
+        .next-step-section { text-align: center; margin-top: 30px; }
+
+        @media (max-width: 1024px) {
+            .main-content { grid-template-columns: 1fr; }
+            .sidebar { order: 2; border-right: none; border-top: 1px solid rgba(80, 0, 0, 0.2); }
+            .meeting-designer { flex-direction: column; }
+        }
+        @media (max-width: 768px) {
+            .scores-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="header-section">
+            <h1 class="main-title">Leadership Meeting Designer</h1>
+            <p class="main-subtitle">Structure Conversations for Coordinated Action</p>
+        </header>
+        <div class="status-bar">
+            <div class="status-item">
+                <div id="designScore" class="status-value"><span>--</span><span class="scale"> / 100</span></div>
+                <div>Design Effectiveness</div>
+            </div>
+            <div class="status-item">
+                <div id="engagementScore" class="status-value"><span>--</span><span class="scale"> / 100</span></div>
+                <div>Engagement Prediction</div>
+            </div>
+            <div class="status-item">
+                <div id="outcomeScore" class="status-value"><span>--</span><span class="scale"> / 100</span></div>
+                <div>Outcome Achievement</div>
+            </div>
+        </div>
+        <div class="main-content">
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Meeting Types</h3>
+                    <div class="sidebar-content">
+                        <ul>
+                            <li><strong>Planning:</strong> Establish objectives and coordinate responsibilities.</li>
+                            <li><strong>Problem-Solving:</strong> Address challenges and make decisions.</li>
+                            <li><strong>Coordination:</strong> Monitor progress and maintain alignment.</li>
+                        </ul>
+                    </div>
+                </div>
+                 <div class="sidebar-section">
+                    <h3 class="sidebar-title">Conversation Structures</h3>
+                    <div class="sidebar-content">
+                        <ul>
+                            <li><strong>Info Sharing & Analysis:</strong> Get comprehensive input from all team members.</li>
+                            <li><strong>Problem Analysis & Solution:</strong> Systematically understand and solve a challenge.</li>
+                            <li><strong>Action Planning & Accountability:</strong> Convert decisions into concrete next steps.</li>
+                        </ul>
+                    </div>
+                </div>
+            </aside>
+            <main class="main-panel">
+                <div id="intro" class="tab-content active">
+                    <h2 style="color: #ffb3b3; margin-bottom: 20px; text-align: center;">Select a Meeting Design Scenario</h2>
+                    <div class="scenario-selection-grid">
+                        <!-- Scenario cards injected here -->
+                    </div>
+                </div>
+
+                <div id="scenario" class="tab-content">
+                    <!-- Scenario content will be injected here -->
+                </div>
+
+                <div id="results" class="tab-content results-panel">
+                     <div class="phase-header" style="text-align:center;">
+                        <h2 class="phase-title">Design Complete</h2>
+                    </div>
+                    <div class="scores-grid">
+                        <div class="score-card">
+                            <div class="score-value" id="finalDesign">--</div>
+                            <div class="score-label">Design Effectiveness</div>
+                        </div>
+                        <div class="score-card">
+                            <div class="score-value" id="finalEngagement">--</div>
+                            <div class="score-label">Engagement Prediction</div>
+                        </div>
+                        <div class="score-card">
+                            <div class="score-value" id="finalOutcome">--</div>
+                            <div class="score-label">Outcome Achievement</div>
+                        </div>
+                    </div>
+                    <div class="feedback-section">
+                        <h3 class="feedback-title">Design Debrief</h3>
+                        <div class="feedback-content" id="feedbackContent"></div>
+                    </div>
+                    <div class="next-step-section">
+                        <button class="btn btn-secondary" id="backToMenuBtn">Back to Scenarios</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const scenarioContainer = document.getElementById('scenario');
+            const introContainer = document.getElementById('intro');
+            const resultsContainer = document.getElementById('results');
+
+            let scores;
+            let currentScenario;
+
+            const scenarios = [
+                {
+                    title: "Team Performance Coordination",
+                    situation: "Your team is meeting to address declining performance and coordinate improvement. The goal is to address patterns without assigning blame.",
+                    correctMeetingType: "problem-solving",
+                    correctStructure: "problem-analysis",
+                    agendaItems: [
+                        { id: 'item1', text: 'Purpose Statement', section: 'opening' },
+                        { id: 'item2', text: 'Agenda Overview', section: 'opening' },
+                        { id: 'item3', text: 'Structured Discussion', section: 'working' },
+                        { id: 'item4', text: 'Action Planning', section: 'working' },
+                        { id: 'item5', text: 'Decision Summary', section: 'closing' },
+                        { id: 'item6', text: 'Next Steps', section: 'closing' }
+                    ]
+                },
+                {
+                    title: "Resource and Priority Coordination",
+                    situation: "Your team needs to coordinate competing priorities and decide how to allocate limited resources for the upcoming quarter.",
+                    correctMeetingType: "planning",
+                    correctStructure: "action-planning",
+                     agendaItems: [
+                        { id: 'item1', text: 'Purpose Statement', section: 'opening' },
+                        { id: 'item2', text: 'Goal Clarification', section: 'opening' },
+                        { id: 'item3', text: 'Resource Identification', section: 'working' },
+                        { id: 'item4', text: 'Timeline Agreement', section: 'working' },
+                        { id: 'item5', text: 'Action Items', section: 'closing' },
+                        { id: 'item6', text: 'Next Steps', section: 'closing' }
+                    ]
+                },
+                {
+                    title: "Weekly Project Sync",
+                    situation: "This is the regular weekly meeting to monitor progress on a critical project, identify any new issues, and ensure everyone is aligned.",
+                    correctMeetingType: "coordination",
+                    correctStructure: "info-sharing",
+                     agendaItems: [
+                        { id: 'item1', text: 'Agenda Overview', section: 'opening' },
+                        { id: 'item2', text: 'Progress Updates', section: 'working' },
+                        { id: 'item3', text: 'Issue Identification', section: 'working' },
+                        { id: 'item4', text: 'Plan Adjustments', section: 'working' },
+                        { id: 'item5', text: 'Action Items', section: 'closing' },
+                        { id: 'item6', text: 'Next Steps', section: 'closing' }
+                    ]
+                }
+            ];
+
+            function updateStatusBars() {
+                document.getElementById('designScore').innerHTML = `<span>${scores.design}</span><span class="scale"> / 100</span>`;
+                document.getElementById('engagementScore').innerHTML = `<span>${scores.engagement}</span><span class="scale"> / 100</span>`;
+                document.getElementById('outcomeScore').innerHTML = `<span>${scores.outcome}</span><span class="scale"> / 100</span>`;
+            }
+
+            function renderScenario(scenarioId) {
+                currentScenario = scenarios[scenarioId];
+                
+                let toolboxItemsHTML = '';
+                // Shuffle items for variety
+                currentScenario.agendaItems.sort(() => Math.random() - 0.5).forEach(item => {
+                    toolboxItemsHTML += `<div class="agenda-item" draggable="true" data-id="${item.id}" data-section="${item.section}">${item.text}</div>`;
+                });
+
+                scenarioContainer.innerHTML = `
+                    <div class="phase-header">
+                        <h3 class="phase-title">${currentScenario.title}</h3>
+                        <p class="phase-description">${currentScenario.situation}</p>
+                    </div>
+                    <div class="phase-content">
+                        <div id="step1-type">
+                            <h4 class="step-title">Step 1: Choose the Primary Meeting Type</h4>
+                            <div class="choice-option meeting-type-choice" data-type="planning"><p><strong>Planning Meeting:</strong> To establish objectives and coordinate responsibilities.</p></div>
+                            <div class="choice-option meeting-type-choice" data-type="problem-solving"><p><strong>Problem-Solving Meeting:</strong> To address specific challenges and make decisions.</p></div>
+                            <div class="choice-option meeting-type-choice" data-type="coordination"><p><strong>Coordination Meeting:</strong> To monitor progress and maintain alignment.</p></div>
+                        </div>
+
+                        <div id="step2-agenda" style="display:none; margin-top: 20px;">
+                            <h4 class="step-title">Step 2: Build the Meeting Agenda (Drag & Drop)</h4>
+                            <div class="meeting-designer">
+                                <div class="agenda-builder">
+                                    <div class="drop-zone" data-zone="opening"><h4>Opening (10%)</h4></div>
+                                    <div class="drop-zone" data-zone="working"><h4>Working Section (70%)</h4></div>
+                                    <div class="drop-zone" data-zone="closing"><h4>Closing (20%)</h4></div>
+                                </div>
+                                <div class="toolbox sidebar-section">
+                                    <h4 class="sidebar-title">Agenda Items</h4>
+                                    <div id="toolbox-items">${toolboxItemsHTML}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="step3-structure" style="display:none; margin-top: 20px;">
+                             <h4 class="step-title">Step 3: Select the Core Conversation Structure</h4>
+                             <div class="choice-option structure-choice" data-type="info-sharing"><p><strong>Info Sharing & Analysis:</strong> Get comprehensive input from all team members.</p></div>
+                             <div class="choice-option structure-choice" data-type="problem-analysis"><p><strong>Problem Analysis & Solution:</strong> Systematically understand and solve a challenge.</p></div>
+                             <div class="choice-option structure-choice" data-type="action-planning"><p><strong>Action Planning & Accountability:</strong> Convert decisions into concrete next steps.</p></div>
+                        </div>
+
+                        <div id="submit-design" style="display:none; text-align:center; margin-top:30px;">
+                            <button class="btn btn-primary" id="submitBtn">Finalize Meeting Design</button>
+                        </div>
+                    </div>
+                `;
+                
+                setupDragAndDrop();
+                
+                document.querySelectorAll('.meeting-type-choice').forEach(btn => {
+                    btn.addEventListener('click', handleMeetingTypeChoice);
+                });
+                document.querySelectorAll('.structure-choice').forEach(btn => {
+                    btn.addEventListener('click', handleStructureChoice);
+                });
+                document.getElementById('submitBtn').addEventListener('click', calculateFinalScore);
+            }
+
+            function handleMeetingTypeChoice(event) {
+                document.querySelectorAll('.meeting-type-choice').forEach(btn => btn.classList.remove('selected'));
+                event.currentTarget.classList.add('selected');
+                scores.meetingType = event.currentTarget.dataset.type;
+                document.getElementById('step2-agenda').style.display = 'block';
+            }
+
+            function handleStructureChoice(event) {
+                document.querySelectorAll('.structure-choice').forEach(btn => btn.classList.remove('selected'));
+                event.currentTarget.classList.add('selected');
+                scores.structureType = event.currentTarget.dataset.type;
+                document.getElementById('submit-design').style.display = 'block';
+            }
+
+            function setupDragAndDrop() {
+                const draggables = document.querySelectorAll('.agenda-item');
+                const dropZones = document.querySelectorAll('.drop-zone');
+
+                draggables.forEach(draggable => {
+                    draggable.addEventListener('dragstart', () => {
+                        draggable.classList.add('dragging');
+                    });
+                    draggable.addEventListener('dragend', () => {
+                        draggable.classList.remove('dragging');
+                        checkAgendaCompletion();
+                    });
+                });
+
+                dropZones.forEach(zone => {
+                    zone.addEventListener('dragover', e => {
+                        e.preventDefault();
+                        zone.classList.add('drag-over');
+                    });
+                    zone.addEventListener('dragleave', () => {
+                        zone.classList.remove('drag-over');
+                    });
+                    zone.addEventListener('drop', e => {
+                        e.preventDefault();
+                        zone.classList.remove('drag-over');
+                        const draggable = document.querySelector('.dragging');
+                        if (draggable) {
+                            zone.appendChild(draggable);
+                        }
+                    });
+                });
+            }
+            
+            function checkAgendaCompletion() {
+                const toolbox = document.getElementById('toolbox-items');
+                if (toolbox.children.length === 0) {
+                    document.getElementById('step3-structure').style.display = 'block';
+                }
+            }
+            
+            function calculateFinalScore() {
+                // Score Design Effectiveness
+                let designScore = 0;
+                if (scores.meetingType === currentScenario.correctMeetingType) {
+                    designScore += 40;
+                }
+                const openingZone = document.querySelector('.drop-zone[data-zone="opening"]');
+                const workingZone = document.querySelector('.drop-zone[data-zone="working"]');
+                const closingZone = document.querySelector('.drop-zone[data-zone="closing"]');
+                
+                openingZone.querySelectorAll('.agenda-item').forEach(item => {
+                    if(item.dataset.section === 'opening') designScore += 10;
+                });
+                workingZone.querySelectorAll('.agenda-item').forEach(item => {
+                    if(item.dataset.section === 'working') designScore += 10;
+                });
+                 closingZone.querySelectorAll('.agenda-item').forEach(item => {
+                    if(item.dataset.section === 'closing') designScore += 10;
+                });
+                scores.design = Math.min(100, designScore);
+
+                // Score Engagement
+                let engagementScore = 0;
+                if (scores.structureType === currentScenario.correctStructure) {
+                    engagementScore += 50;
+                }
+                if (scores.design > 70) engagementScore += 50;
+                else if (scores.design > 40) engagementScore += 25;
+                scores.engagement = engagementScore;
+                
+                // Score Outcome
+                scores.outcome = Math.round((scores.design + scores.engagement) / 2);
+
+                updateStatusBars();
+                showResults();
+            }
+
+            function showResults() {
+                scenarioContainer.classList.remove('active');
+                resultsContainer.classList.add('active');
+
+                document.getElementById('finalDesign').textContent = scores.design;
+                document.getElementById('finalEngagement').textContent = scores.engagement;
+                document.getElementById('finalOutcome').textContent = scores.outcome;
+
+                let feedback = `Your final design achieved an overall outcome score of ${scores.outcome}.<br/><br/>`;
+                if(scores.design < 60) {
+                    feedback += "<strong>Design Feedback:</strong> The agenda structure could be stronger. Ensure you're selecting the right meeting type and placing core items like 'Purpose Statement' and 'Action Items' in the correct sections.<br/>";
+                } else {
+                    feedback += "<strong>Design Feedback:</strong> Great job structuring the meeting! The agenda is logical and covers the essential components for a productive conversation.<br/>";
+                }
+                 if(scores.engagement < 75) {
+                    feedback += "<strong>Engagement Feedback:</strong> The chosen conversation structure might not be the most effective for this scenario's specific challenge, which could impact team engagement.";
+                } else {
+                    feedback += "<strong>Engagement Feedback:</strong> Excellent choice of conversation structure! This approach is well-suited to engage participants and solve the problem effectively.";
+                }
+
+                document.getElementById('feedbackContent').innerHTML = feedback;
+            }
+
+            function startScenario(scenarioId) {
+                scores = { design: 0, engagement: 0, outcome: 0 };
+                updateStatusBars();
+                introContainer.classList.remove('active');
+                resultsContainer.classList.remove('active');
+                scenarioContainer.classList.add('active');
+                renderScenario(scenarioId);
+            }
+            
+            function showIntro() {
+                const grid = introContainer.querySelector('.scenario-selection-grid');
+                grid.innerHTML = '';
+                scenarios.forEach((scenario, index) => {
+                    grid.innerHTML += `
+                        <div class="scenario-card" data-scenario-id="${index}">
+                            <h3>${scenario.title}</h3>
+                            <p style="font-size: 13px;">${scenario.situation.substring(0, 100)}...</p>
+                        </div>
+                    `;
+                });
+                 document.querySelectorAll('.scenario-card').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        startScenario(parseInt(e.currentTarget.dataset.scenarioId));
+                    });
+                });
+            }
+
+            document.getElementById('backToMenuBtn').addEventListener('click', () => {
+                 resultsContainer.classList.remove('active');
+                 introContainer.classList.add('active');
+                 scores = { design: '--', engagement: '--', outcome: '--' };
+                 updateStatusBars();
+            });
+            
+            // Initial setup
+            showIntro();
+            scores = { design: '--', engagement: '--', outcome: '--' };
+            updateStatusBars();
+        });
+    </script>
+</body>
+</html>
